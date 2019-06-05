@@ -23,8 +23,12 @@ interface Props {
   children?: React.ReactNode;
   className?: string;
   tabbed?: boolean;
-  // eslint-disable-next-line no-use-before-define
-  items?: React.ReactElement<typeof Nav.Item>[];
+  /**
+   * @deprecated use children instead
+   */
+  items?:
+    | React.ReactElement<typeof Nav.Item>
+    | React.ReactElement<typeof Nav.Item>[];
   itemsObjects?: Array<navItem>;
   routerContextComponentType?: any;
 }
@@ -96,32 +100,33 @@ class Nav extends React.Component<Props, State> {
       } as any);
     }
 
+    const _items =
+      items ||
+      (itemsObjects &&
+        itemsObjects.map((a, i) => (
+          <Nav.Item
+            key={i}
+            icon={a.icon}
+            value={a.value}
+            to={a.to}
+            hasSubNav={!!a.subItems}
+            LinkComponent={a.LinkComponent}
+            subItemsObjects={a.subItems}
+            active={this.computeActive(a.active, a.to, a.subItems)}
+            useExact={a.useExact}
+          />
+        )));
+    const _children = _items || children;
+
     return (
       <React.Fragment>
         {element}
-        <ul className={classes}>
-          {items ||
-            (itemsObjects &&
-              itemsObjects.map((a, i) => (
-                <Nav.Item
-                  key={i}
-                  icon={a.icon}
-                  value={a.value}
-                  to={a.to}
-                  hasSubNav={!!a.subItems}
-                  LinkComponent={a.LinkComponent}
-                  subItemsObjects={a.subItems}
-                  active={this.computeActive(a.active, a.to, a.subItems)}
-                  useExact={a.useExact}
-                />
-              ))) ||
-            children}
-        </ul>
+        <ul className={classes}>{_children}</ul>
       </React.Fragment>
     );
   }
 }
 
-//Nav.Item = NavItem;
+// Nav.Item = NavItem;
 
 export default Nav;
